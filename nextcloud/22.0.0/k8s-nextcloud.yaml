@@ -1,0 +1,72 @@
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+  namespace: sre
+  labels:
+    app: nextcloud
+spec:
+  selector:
+    matchLabels:
+      app: nextcloud
+  template:
+    metadata:
+      labels:
+        app: nextcloud
+    spec:
+      containers:
+      - name: nextcloud
+        image: nextcloud:22.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - name: nextcloud-data
+          mountPath: /var/www/html
+      volumes:
+      - hostPath:
+          path: /opt/docker_data/nextcloud
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud
+  namespace: sre
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
+  selector:
+    app: nextcloud
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: disk-jason-com
+  namespace: sre
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 10240m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+spec:
+  rules:
+  - host: disk.jason.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: nextcloud
+          servicePort: 80
