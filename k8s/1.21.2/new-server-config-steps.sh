@@ -16,6 +16,8 @@ yum -y install ntpdate
 ntpdate pool.ntp.org
 
 #centos7
+mkdir /home/k8s
+cd /home/k8s
 wget https://raw.githubusercontent.com/haha1994/docker_images/main/k8s/etc_modules-load.d_k8s.conf
 cp ./etc_modules-load.d_k8s.conf /etc/modules-load.d/k8s.conf
 
@@ -103,7 +105,7 @@ wget https://github.com/flannel-io/flannel/blob/master/Documentation/kube-flanne
 kubectl apply -f kube-flannel.yml
 
 #安装ingress-nginx-controller
-// TODO
+# TODO
 wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/deploy.yaml
 
 # 修改 ingress-nginx-controller 的 Deployment
@@ -120,7 +122,7 @@ kubectl delete -A validatingwebhookconfiguration ingress-nginx-admission
 #附录
 
 # 附录一 记录如何使用阿里云镜像构建的功能，拉取外网镜像
-// TODO
+# TODO
 
 # 附录二 coredns 拉取失败的问题
 # 实际镜像为：k8s.gcr.io/coredns/coredns:v1.8.0
