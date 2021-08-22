@@ -18,15 +18,15 @@ ntpdate pool.ntp.org
 #centos7
 mkdir /home/k8s
 cd /home/k8s
-wget https://raw.githubusercontent.com/haha1994/docker_images/main/k8s/etc_modules-load.d_k8s.conf
+wget https://raw.githubusercontent.com/haha1994/docker_images/main/k8s/v1.21.2/etc_modules-load.d_k8s.conf
 cp ./etc_modules-load.d_k8s.conf /etc/modules-load.d/k8s.conf
 
-wget https://raw.githubusercontent.com/haha1994/docker_images/main/k8s/etc_sysctl.d_k8s.conf
+wget https://raw.githubusercontent.com/haha1994/docker_images/main/k8s/v1.21.2/etc_sysctl.d_k8s.conf
 cp ./etc_sysctl.d_k8s.conf /etc/sysctl.d/k8s.conf
 
 sudo sysctl --system
 
-wget https://raw.githubusercontent.com/haha1994/docker_images/main/k8s/etc_yum.repos.d_kubernetes.repo
+wget https://raw.githubusercontent.com/haha1994/docker_images/main/k8s/v1.21.2/etc_yum.repos.d_kubernetes.repo
 cp ./etc_yum.repos.d_kubernetes.repo /etc/yum.repos.d/kubernetes.repo
 
 #master上执行：
