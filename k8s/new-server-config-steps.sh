@@ -16,8 +16,6 @@ yum -y install ntpdate
 ntpdate pool.ntp.org
 
 #centos7
-
-#TODO 
 wget https://raw.githubusercontent.com/haha1994/docker_images/main/k8s/etc_modules-load.d_k8s.conf
 cp ./etc_modules-load.d_k8s.conf /etc/modules-load.d/k8s.conf
 
