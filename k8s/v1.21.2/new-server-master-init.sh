@@ -38,36 +38,32 @@ sudo systemctl enable --now kubelet && systemctl start kubelet
 #yum remove kubeadm kubectl kubelet -y
 #yum -y install kubelet-1.18.0 kubeadm-1.18.0 kubectl-1.18.0（版本随意）
 
-## 安装docker-ce
-#mkdir /home/docker
-#cd /home/docker
-#curl -fsSL get.docker.com -o get-docker.sh
-#sudo sh get-docker.sh --mirror Aliyun
-#
-##创建 /etc/docker 目录
-#mkdir /etc/docker
-#
-##配置 daemon.json
-#cat > /etc/docker/daemon.json <<EOF
-#{
-#  "exec-opts": ["native.cgroupdriver=systemd"],
-#  "log-driver": "json-file",
-#  "log-opts": {
-#    "max-size": "100m"
-#  }
-#}
-#EOF
-#mkdir -p /etc/systemd/system/docker.service.d
-#
-##重启docker服务
-#systemctl daemon-reload
-#systemctl restart docker
-#systemctl enable docker
+# 安装docker-ce
+mkdir /home/docker
+cd /home/docker
+yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
+curl -fsSL get.docker.com -o get-docker.sh
+# 确定安装版本20.10
+VERSION=20.10 sh get-docker.sh --mirror Aliyun
+
+#配置 daemon.json
+mkdir /etc/docker
+
+wget https://raw.githubusercontent.com/haha1994/docker_images/main/k8s/v1.21.2/etc_docker_daemon.json
+cp ./etc_docker_daemon.json /etc/docker/daemon.json
+
+mkdir -p /etc/systemd/system/docker.service.d
+
+#重启docker服务
+systemctl daemon-reload
+systemctl restart docker
+systemctl enable docker
 #sudo service docker status
-#
-## k8s中，如果用户没有在 KubeletConfiguration 中设置 cgroupDriver 字段， kubeadm init 会将它设置为默认值 systemd
-#
-##打印kubeadm初始化配置
+
+# k8s中，如果用户没有在 KubeletConfiguration 中设置 cgroupDriver 字段， kubeadm init 会将它设置为默认值 systemd
+
+#打印kubeadm初始化配置
+cd /home/k8s
 #kubeadm config print init-defaults > kubeadm-config.yaml
 ##修改其中信息
 #advertiseAddress: 192.168.127.10 #master节点的IP
@@ -75,24 +71,25 @@ sudo systemctl enable --now kubelet && systemctl start kubelet
 #imageRepository: registry.cn-hangzhou.aliyuncs.com/fxhaha
 #kubernetesVersion: v1.21.2 #Kubernetes软件版本
 #podSubnet: 10.244.0.0/16 #networking下添加这个内容
-#
-##预先下载镜像
-#kubeadm config images pull --config kubeadm-config.yaml
-#
-##初始化节点，如果kubeadm初始化失败了，一定要kubeadm reset
-#kubeadm init --config=kubeadm-config.yaml | tee kubeadm-init.log
-#
-#export KUBECONFIG=/etc/kubernetes/admin.conf
-#
-## 安装网络插件flannel，官网地址https://github.com/flannel-io/flannel
-## 官方Readme中的地址也写错了，没有更新为最新地址（如下）
-#wget https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
-#kubectl apply -f kube-flannel.yml
-#
-##将主节点做为工作节点
-#kubectl taint nodes --all node-role.kubernetes.io/master-
-#
-##加入工作节点
+
+#预先下载镜像
+kubeadm config images pull --config kubeadm-config.yaml
+
+#初始化节点，如果kubeadm初始化失败了，一定要kubeadm reset
+kubeadm init --config=kubeadm-config.yaml | tee kubeadm-init.log
+
+export KUBECONFIG=/etc/kubernetes/admin.conf
+# TODO 这个需要添加到环境变量
+
+# 安装网络插件flannel，官网地址https://github.com/flannel-io/flannel
+# 官方Readme中的地址也写错了，没有更新为最新地址（如下）
+wget https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+kubectl apply -f kube-flannel.yml
+
+#将主节点做为工作节点
+kubectl taint nodes --all node-role.kubernetes.io/master-
+
+#加入工作节点
 #kubeadm join --token <token> <master-ip>:<master-port> --discovery-token-ca-cert-hash sha256:<hash>
 #
 ##安装网络插件
