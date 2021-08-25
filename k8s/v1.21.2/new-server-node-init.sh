@@ -77,7 +77,7 @@ kubeadm config print init-defaults > kubeadm-config.yaml
 advertiseAddress: 192.168.127.10 #master节点的IP
 name: 192.168.137.10 #修改为IP地址，如果使用域名，必须保证解析正常
 imageRepository: registry.cn-hangzhou.aliyuncs.com/fxhaha
-kubernetesVersion: v1.21.2 #Kubernetes软件版本
+kubernetesVersion: 1.21.2 #Kubernetes软件版本
 podSubnet: 10.244.0.0/16 #networking下添加这个内容
 
 #预先下载镜像

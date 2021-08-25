@@ -49,6 +49,7 @@ VERSION=20.10 sh get-docker.sh --mirror Aliyun
 #配置 daemon.json
 mkdir /etc/docker
 
+# 修改docker cgroup
 wget https://raw.githubusercontent.com/haha1994/docker_images/main/k8s/v1.21.2/etc_docker_daemon.json
 cp ./etc_docker_daemon.json /etc/docker/daemon.json
 
@@ -62,6 +63,9 @@ systemctl enable docker
 
 # k8s中，如果用户没有在 KubeletConfiguration 中设置 cgroupDriver 字段， kubeadm init 会将它设置为默认值 systemd
 
+
+# TODO 需要管理员输入IP
+read -p "Please enter the IP address of this machine:" ipaddress
 #打印kubeadm初始化配置
 cd /home/k8s
 #kubeadm config print init-defaults > kubeadm-config.yaml
@@ -69,7 +73,7 @@ cd /home/k8s
 #advertiseAddress: 192.168.127.10 #master节点的IP
 #name: 192.168.137.10 #修改为IP地址，如果使用域名，必须保证解析正常
 #imageRepository: registry.cn-hangzhou.aliyuncs.com/fxhaha
-#kubernetesVersion: v1.21.2 #Kubernetes软件版本
+#kubernetesVersion: 1.21.2 #Kubernetes软件版本
 #podSubnet: 10.244.0.0/16 #networking下添加这个内容
 
 #预先下载镜像
