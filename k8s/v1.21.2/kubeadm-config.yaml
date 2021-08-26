@@ -9,11 +9,11 @@ bootstrapTokens:
   - authentication
 kind: InitConfiguration
 localAPIEndpoint:
-  advertiseAddress: 192.168.31.119 #master节点的IP
+  advertiseAddress: youripaddress #master节点的IP
   bindPort: 6443
 nodeRegistration:
   criSocket: /var/run/dockershim.sock
-  name: 192.168.31.119 #修改为IP地址，如果使用域名，必须保证解析正常
+  name: youripaddress #修改为IP地址，如果使用域名，必须保证解析正常
   taints: null
 ---
 apiServer:
