@@ -1,7 +1,7 @@
 apiVersion: kubeadm.k8s.io/v1beta2
 bootstrapTokens:
 - groups:
-  - system: bootstrappers:kubeadm:default-node-token
+  - system:bootstrappers:kubeadm:default-node-token
   token: abcdef.0123456789abcdef
   ttl: 24h0m0s
   usages:
@@ -29,7 +29,7 @@ etcd:
     dataDir: /var/lib/etcd #把etcd容器的目录挂载到本地的/var/lib/etcd目录下，防止数据丢失
 imageRepository: registry.cn-hangzhou.aliyuncs.com/fxhaha #镜像仓库地址，可以修改为gcr.azk8s.cn/google_containers
 kind: ClusterConfiguration
-kubernetesVersion: v1.21.2 #Kubernetes软件版本
+kubernetesVersion: 1.21.2 #Kubernetes软件版本
 networking:
   dnsDomain: cluster.local
   serviceSubnet: 10.96.0.0/12
