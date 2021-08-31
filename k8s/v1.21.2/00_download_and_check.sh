@@ -98,8 +98,8 @@ if [ ! -f '01_new_server_master_init.sh' ];then
     exit 1
 fi
 
-if [ ! -f '01_new_server_node_init.sh' ];then
-    echo '01_new_server_node_init.sh NOT FOUND!'
+if [ ! -f '02_new_server_node_init.sh' ];then
+    echo '02_new_server_node_init.sh NOT FOUND!'
     exit 1
 fi
 
