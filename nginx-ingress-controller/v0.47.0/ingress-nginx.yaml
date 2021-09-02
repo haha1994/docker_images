@@ -317,11 +317,11 @@ spec:
         app.kubernetes.io/instance: ingress-nginx
         app.kubernetes.io/component: controller
     spec:
-      hostNetWork: true
+      hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: controller
-          image: k8s.gcr.io/ingress-nginx/controller:v0.47.0@sha256:a1e4efc107be0bb78f32eaec37bef17d7a0c81bec8066cdf2572508d21351d0b
+          image: registry.cn-hangzhou.aliyuncs.com/fxhaha/nginx-ingress-controller:v0.47.0
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:
