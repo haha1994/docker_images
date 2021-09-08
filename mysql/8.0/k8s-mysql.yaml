@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mysql
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: mysql
+  labels:
+    app: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        imagePullPolicy: IfNotPresent
+        restart: always
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root"
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+      - name: adminer
+        image: adminer:4.8.1
+        imagePullPolicy: IfNotPresent
+        restart: always
+        ports:
+        - containerPort: 8080
+          name: adminer
+      volumes:
+      - name: mysql-data
+        hostPath:
+          path: /opt/docker_data/mysql
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: mysql
+spec:
+  ports:
+  - name: mysql
+    protocol: TCP
+    port: 3306
+    targetPort: mysql
+  - name: adminer
+    protocol: TCP
+    port: 8080
+    targetPort: adminer
+  selector:
+    app: mysql
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mysql-jason-com
+  namespace: mysql
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 10240m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+
+spec:
+  rules:
+  - host: mysql.jason.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mysql
+            port: 
+              number: 3306
+      - path: /adminer
+        pathType: Prefix
+        backend:
+          service:
+            name: mysql
+            port: 
+              number: 8080
