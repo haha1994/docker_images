@@ -81,6 +81,8 @@ echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >> /etc/profile
 # 将主节点做为工作节点
 kubectl taint nodes --all node-role.kubernetes.io/master-
 
+kubectl label node "${youripaddress}" role=master
+
 # 安装网络插件flannel v0.14.0，官网地址https://github.com/flannel-io/flannel
 # 官方Readme中的地址也写错了，没有更新为最新地址（如下）
 # wget https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml

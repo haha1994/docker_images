@@ -21,11 +21,12 @@ spec:
       labels:
         app: mysql
     spec:
+      nodeSelector: 
+        role: master
       containers:
       - name: mysql
         image: mysql:8.0
         imagePullPolicy: IfNotPresent
-        restart: always
         env:
         - name: MYSQL_ROOT_PASSWORD
           value: "root"
@@ -38,7 +39,6 @@ spec:
       - name: adminer
         image: adminer:4.8.1
         imagePullPolicy: IfNotPresent
-        restart: always
         ports:
         - containerPort: 8080
           name: adminer
@@ -54,11 +54,13 @@ metadata:
   name: mysql
   namespace: mysql
 spec:
+  type: NodePort
   ports:
   - name: mysql
     protocol: TCP
     port: 3306
     targetPort: mysql
+    nodePort: 30006
   - name: adminer
     protocol: TCP
     port: 8080
@@ -77,19 +79,11 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
-
 spec:
   rules:
   - host: mysql.jason.com
     http:
       paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: mysql
-            port: 
-              number: 3306
       - path: /adminer
         pathType: Prefix
         backend:
