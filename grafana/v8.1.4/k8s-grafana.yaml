@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-ops
+  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: kube-ops
+  labels:
+    app: grafana
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: grafana
+  minReadySeconds: 0
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      nodeSelector: 
+        role: master
+      # affinity:         #亲和性的调度设置
+      #   nodeAffinity:   #策略为节点亲和性
+      #     requiredDuringSchedulingIgnoredDuringExecution:      #亲和性的硬策略
+      #       nodeSelectorTerms:   #这里不再使用nodeselector，使用这个参数可以进行相对简单的逻辑运算
+      #       - matchExpressions:     #匹配表达式
+      #         - key: kubernetes.io/hostname      #具体匹配规则(可以通过kubectl get node --show-labels找到相应规则)
+      #           operator: In  #不在，简单的来说就是不在k8s-04节点
+      #           values:
+      #           - prod-k8s-n006
+
+      containers:
+      - name: grafana
+        image: grafana/grafana:7.4.5
+        resources:
+          limits:
+            memory: "2048Mi"
+            cpu: "2000m"
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+          name: http
+
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/grafana
+        - name: config-volume
+          mountPath: "/usr/share/grafana/conf/defaults.ini"
+          subPath: defaults.ini
+      volumes:
+      - name: data
+        hostPath:
+      # 宿主上目录位置
+          path: /opt/docker_data/grafana
+          type: DirectoryOrCreate
+      - configMap:
+          name: grafana-config
+        name: config-volume
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: kube-ops
+  labels:
+    app: grafana
+spec:
+  selector:
+    app: grafana
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: http
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+# 通过添加下面的annotations 来开启白名单
+# 关闭80强制跳转443 为ingress配置增加注解（annotations）：nginx.ingress.kubernetes.io/ssl-redirect: 'false' 就可以禁止http强制跳转至https
+  annotations:
+    #nginx.ingress.kubernetes.io/whitelist-source-range: "60.191.70.64/29, xx.xxx.0.0/16"
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+  name: grafana
+  namespace: kube-ops
+spec:
+  rules:
+    - host: grafana.jason.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: grafana
+            servicePort: 80
+
+

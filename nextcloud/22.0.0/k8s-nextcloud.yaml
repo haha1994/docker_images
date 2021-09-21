@@ -21,6 +21,8 @@ spec:
       labels:
         app: nextcloud
     spec:
+      # nodeSelector: 
+      #   role: master
       containers:
       - name: nextcloud
         image: nextcloud:22.0.0
