@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-ops
+  
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+  namespace: kube-ops
+  labels:
+    k8s-app: node-exporter
+spec:
+  selector:
+    matchLabels:
+      k8s-app: node-exporter
+  template:
+    metadata:
+      labels:
+        k8s-app: node-exporter
+    spec:
+      hostPID: true
+      hostIPC: true
+      hostNetwork: true
+      containers:
+      - image: prom/node-exporter:v1.2.2
+        name: node-exporter
+        args:
+        - "--collector.systemd"
+        - "--collector.systemd.unit-whitelist=(docker|sshd|nginx).service"
+        #- "--collector.vmstat.fields=^(oom_kill|pgpg|pswp|nr|pg.*fault).*" # 需要centos8等高内核版本才支持
+        ports:
+        - containerPort: 9100
+          protocol: TCP
+          name: http
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        securityContext:
+          runAsUser: 0
+          privileged: true
+        volumeMounts:
+        - mountPath: /run/systemd/private
+          name: systemd-socket
+          readOnly: true
+        - name: dev
+          mountPath: /host/dev
+        - name: proc
+          mountPath: /host/proc
+        - name: sys
+          mountPath: /host/sys
+        - name: rootfs
+          mountPath: /host/root
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      volumes:
+        - name: systemd-socket
+          hostPath:
+            path: /run/systemd/private
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: dev
+          hostPath:
+            path: /dev
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: rootfs
+          hostPath:
+            path: /
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: node-exporter
+  name: node-exporter
+  namespace: kube-ops
+spec:
+  ports:
+  - name: http
+    port: 9100
+    nodePort: 30100
+    protocol: TCP
+  type: NodePort
+  selector:
+    k8s-app: node-exporter

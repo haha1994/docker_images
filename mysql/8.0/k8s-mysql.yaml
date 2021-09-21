@@ -60,7 +60,7 @@ spec:
     protocol: TCP
     port: 3306
     targetPort: mysql
-    nodePort: 30006
+    nodePort: 30306
   - name: adminer
     protocol: TCP
     port: 8080
