@@ -1,4 +1,6 @@
 # Readme
+https://prometheus.io/
+https://github.com/prometheus/node_exporter
 port: 9100
 
 由于我们要获取到的数据是主机的监控指标数据，而我们的 node-exporter 是运行在容器中的，所以我们在 Pod 中需要配置一些 Pod 的安全策略，这里我们就添加了hostPID: true、hostIPC: true、hostNetwork: true3个策略，用来使用主机的 PID namespace、IPC namespace 以及主机网络，这些 namespace 就是用于容器隔离的关键技术，要注意这里的 namespace 和集群中的 namespace 是两个完全不相同的概念。
