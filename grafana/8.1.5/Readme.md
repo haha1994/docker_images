@@ -3,6 +3,7 @@
 ```
 https://grafana.com
 https://github.com/grafana/grafana
+https://grafana.com/docs/grafana/latest/administration/configuration/
 ```
 ### port
 ```
