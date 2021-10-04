@@ -37,10 +37,10 @@ spec:
       containers:
       - name: grafana
         image: fengshengjie/grafana-custom:8.1.5
-        resources:
-          limits:
-            memory: "2048Mi"
-            cpu: "2000m"
+        #resources:
+        #  limits:
+        #    memory: "2048Mi"
+        #    cpu: "2000m"
         readinessProbe:
           httpGet:
             path: /api/health
@@ -89,7 +89,7 @@ spec:
     targetPort: http
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
 # 通过添加下面的annotations 来开启白名单
@@ -105,8 +105,11 @@ spec:
       http:
         paths:
         - path: /
+          pathType: Prefix
           backend:
-            serviceName: grafana
-            servicePort: 80
+            service:
+              name: grafana
+              port: 
+                number: 80
 
 

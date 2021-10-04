@@ -12,6 +12,7 @@ https://grafana.com/docs/grafana/latest/administration/configuration/
 
 ### 配置文件
 ```
+/etc/grafana/grafana.ini
 /usr/share/grafana/conf/defaults.ini
 ```
 ### 说明

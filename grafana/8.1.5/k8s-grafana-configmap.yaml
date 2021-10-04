@@ -590,8 +590,8 @@ data:
         #################################### SMTP / Emailing #####################
         [smtp]
         enabled = true
-        host = smtp.office365.com:588
-        user = fengshengjie
+        host = smtp.office365.com:587
+        user = fengshengjie@hotmail.com
         # If the password contains # or ; you have to wrap it with triple quotes. Ex """#password;"""
         password = 
         cert_file =
