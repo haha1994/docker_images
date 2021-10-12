@@ -22,7 +22,7 @@ data:
       - targets: ['prometheus.jason.com']
     - job_name: 'docker'
       static_configs:
-      - targets: ['192.168.31.122:8080', '192.168.31.122:30100']  ## 目标主机
+      - targets: ['192.168.31.122:9100']  ## 目标主机
     - job_name: 'kubernetes-cadvisor'
       metrics_path: '/metrics/cadvisor'
       static_configs:
