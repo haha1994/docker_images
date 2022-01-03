@@ -36,19 +36,19 @@ spec:
           httpGet:
             path: /sessions/new
             port: 9000
-          initialDelaySeconds: 60
+          initialDelaySeconds: 90
           periodSeconds: 30
         readinessProbe:
           httpGet:
             path: /sessions/new
             port: 9000
-          initialDelaySeconds: 60
+          initialDelaySeconds: 90
           periodSeconds: 30
           failureThreshold: 6
         resources:
           limits:
-            cpu: 200m
-            memory: 1000Mi
+            cpu: 300m
+            memory: 1800Mi
           requests:
             cpu: 200m
             memory: 1000Mi
