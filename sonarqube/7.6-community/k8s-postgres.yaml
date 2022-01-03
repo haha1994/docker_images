@@ -34,10 +34,10 @@ spec:
           value: "sonarqube"
         resources:
           limits:
-            cpu: 500m
+            cpu: 200m
             memory: 200Mi
           requests:
-            cpu: 500m
+            cpu: 200m
             memory: 200Mi
         volumeMounts:
           - name: data

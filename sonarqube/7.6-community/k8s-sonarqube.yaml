@@ -47,25 +47,28 @@ spec:
           failureThreshold: 6
         resources:
           limits:
-            cpu: 500m
-            memory: 200Mi
+            cpu: 200m
+            memory: 1000Mi
           requests:
-            cpu: 500m
-            memory: 200Mi
+            cpu: 200m
+            memory: 1000Mi
         volumeMounts:
         - mountPath: /opt/sonarqube/conf
-          name: data
-          subPath: conf
+          name: sonarqube-conf
         - mountPath: /opt/sonarqube/data
-          name: data
-          subPath: data
+          name: sonarqube-data
         - mountPath: /opt/sonarqube/extensions
-          name: data
-          subPath: extensions
+          name: sonarqube-extensions
       volumes:
-      - name: data
+      - name: sonarqube-conf
         hostPath:
-          path: /opt/docker_data/sonarqube
+          path: /opt/docker_data/sonarqube/conf
+      - name: sonarqube-data
+        hostPath:
+          path: /opt/docker_data/sonarqube/data
+      - name: sonarqube-extensions
+        hostPath:
+          path: /opt/docker_data/sonarqube/extensions
 
 ---
 apiVersion: v1
