@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: sonarqube
+  name: sonarqube
+  labels:
+    app: sonarqube
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarqube
+  template:
+    metadata:
+      labels:
+        app: sonarqube
+    spec:
+      nodeSelector:
+        role: master
+      containers:
+      - name: sonarqube
+        image: sonarqube:7.6-community
+        ports:
+        - containerPort: 9000
+        env:
+        - name: SONARQUBE_JDBC_USERNAME
+          value: "sonarqube"
+        - name: SONARQUBE_JDBC_PASSWORD
+          value: "sonarqube"
+        - name: SONARQUBE_JDBC_URL
+          value: "jdbc:postgresql://postgres-sonar:5432/sonarqube"
+        livenessProbe:
+          httpGet:
+            path: /sessions/new
+            port: 9000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /sessions/new
+            port: 9000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          failureThreshold: 6
+        resources:
+          limits:
+            cpu: 500m
+            memory: 200Mi
+          requests:
+            cpu: 500m
+            memory: 200Mi
+        volumeMounts:
+        - mountPath: /opt/sonarqube/conf
+          name: data
+          subPath: conf
+        - mountPath: /opt/sonarqube/data
+          name: data
+          subPath: data
+        - mountPath: /opt/sonarqube/extensions
+          name: data
+          subPath: extensions
+      volumes:
+      - name: data
+        hostPath:
+          path: /opt/docker_data/sonarqube
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sonarqube
+  labels:
+    app: sonarqube
+spec:
+  ports:
+    - name: sonarqube
+      port: 80
+      targetPort: 9000
+      protocol: TCP
+  selector:
+    app: sonarqube
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+# 通过添加下面的annotations 来开启白名单
+# 关闭80强制跳转443 为ingress配置增加注解（annotations）：nginx.ingress.kubernetes.io/ssl-redirect: 'false' 就可以禁止http强制跳转至https
+  annotations:
+    #nginx.ingress.kubernetes.io/whitelist-source-range: "60.191.70.64/29, xx.xxx.0.0/16"
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+  name: sonarqube
+  namespace: sonarqube
+spec:
+  rules:
+    - host: sonarqube.jason.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: sonarqube
+              port: 
+                number: 80

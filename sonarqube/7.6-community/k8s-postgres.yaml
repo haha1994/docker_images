@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: sonarqube
+  name: postgres-sonar
+  labels:
+    app: postgres-sonar
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-sonar
+  template:
+    metadata:
+      labels:
+        app: postgres-sonar
+    spec:
+      nodeSelector:
+        role: master
+      containers:
+      - name: postgres-sonar
+        image: postgres:14.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: "sonarqube"
+        - name: POSTGRES_USER
+          value: "sonarqube"
+        - name: POSTGRES_PASSWORD 
+          value: "sonarqube"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 200Mi
+          requests:
+            cpu: 500m
+            memory: 200Mi
+        volumeMounts:
+          - name: data
+            mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          hostPath:
+            path: /opt/docker_data/sonarqubeDB
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-sonar
+  labels:
+    app: postgres-sonar
+spec:
+  clusterIP: None
+  ports:
+  - port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    app: postgres-sonar
