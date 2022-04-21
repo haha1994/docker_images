@@ -27,6 +27,12 @@
 
 - 暂无
 
+### Dashboard
+
+- kubernetesui/dashboard:v2.5.1
+- kubernetesui/metrics-scraper:v1.0.7
+- kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.1/aio/deploy/recommended.yaml
+
 --
 ## 操作步骤
 ### 关闭防火墙
