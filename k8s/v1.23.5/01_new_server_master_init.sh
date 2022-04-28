@@ -77,6 +77,7 @@ kubeadm init --config=kubeadm-config.yaml | tee kubeadm-init.log
 # 将k8s配置路径添加到环境变量
 export KUBECONFIG=/etc/kubernetes/admin.conf
 echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >> /etc/profile
+source /etc/profile
 
 # 将主节点做为工作节点
 kubectl taint nodes --all node-role.kubernetes.io/master-
@@ -101,3 +102,8 @@ kubectl apply -f kube-flannel.yml
 
 kubectl apply -f ingress-nginx.yaml
 kubectl delete -A validatingwebhookconfiguration ingress-nginx-admission
+
+# 安装dashboard v2.5.1
+# @see dashboard/README.md
+# 安装metrics-server v0.6.1
+# @see metrics-server/metrics-server/README.md
