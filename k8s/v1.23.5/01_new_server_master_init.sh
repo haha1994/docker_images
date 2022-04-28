@@ -84,9 +84,8 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 kubectl label node "${youripaddress}" role=master
 
 # 安装网络插件flannel v0.17.0，官网地址https://github.com/flannel-io/flannel
-# 官方Readme中的地址也写错了，没有更新为最新地址（如下）
 # wget https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
-# wget https://raw.githubusercontent.com/haha1994/docker_images/main/kube-flannel/v0.14.0/kube-flannel.yml
+# wget https://raw.githubusercontent.com/haha1994/docker_images/main/kube-flannel/v0.17.0/kube-flannel.yml
 kubectl apply -f kube-flannel.yml
 
 # 安装ingress-nginx-controller v1.1.3
@@ -98,7 +97,7 @@ kubectl apply -f kube-flannel.yml
 #    spec:
 #      hostNetwork: true # add 
 #      dnsPolicy: ClusterFirstWithHostNet # modify
-# wget https://raw.githubusercontent.com/haha1994/docker_images/main/nginx-ingress-controller/v0.47.0/ingress-nginx.yaml
+# wget https://raw.githubusercontent.com/haha1994/docker_images/main/ingress-nginx/controller/v1.1.3/ingress-nginx.yaml
 
 kubectl apply -f ingress-nginx.yaml
 kubectl delete -A validatingwebhookconfiguration ingress-nginx-admission

@@ -41,11 +41,11 @@ if [ ! -f 'kubeadm-config.yaml' ];then
 fi
 
 if [ ! -f 'kube-flannel.yml' ];then
-    wget "${baseUrl}kube-flannel/v0.14.0/kube-flannel.yml"
+    wget "${baseUrl}kube-flannel/v0.17.0/kube-flannel.yml"
 fi
 
 if [ ! -f 'ingress-nginx.yaml' ];then
-    wget "${baseUrl}nginx-ingress-controller/v0.47.0/ingress-nginx.yaml"
+    wget "${baseUrl}ingress-nginx/controller/v1.1.3/ingress-nginx.yaml"
 fi
 
 if [ ! -f '01_new_server_master_init.sh' ];then

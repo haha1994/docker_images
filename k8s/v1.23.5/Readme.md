@@ -32,6 +32,7 @@
 - kubernetesui/dashboard:v2.5.1
 - kubernetesui/metrics-scraper:v1.0.7
 - kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.1/aio/deploy/recommended.yaml
+- metrics-server/metrics-server:v0.6.1
 
 --
 ## 操作步骤
@@ -54,3 +55,18 @@ setenforce 0 && sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
 yum -y install ntpdate
 ntpdate pool.ntp.org
 ```
+
+## 需要中转的镜像
+### K8S
+k8s.gcr.io/kube-apiserver:v1.23.5
+k8s.gcr.io/kube-controller-manager:v1.23.5
+k8s.gcr.io/kube-scheduler:v1.23.5
+k8s.gcr.io/kube-proxy:v1.23.5
+k8s.gcr.io/pause:3.6
+k8s.gcr.io/etcd:3.5.1-0
+k8s.gcr.io/coredns/coredns:v1.8.6
+### ingress
+k8s.gcr.io/ingress-nginx/controller:v1.1.3
+k8s.gcr.io/ingress-nginx/kube-webhook-certgen:v1.1.1
+### dashboard
+k8s.gcr.io/metrics-server/metrics-server:v0.6.1
