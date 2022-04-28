@@ -7,8 +7,9 @@
 
 ### 网络
 
-- flannel
+- flannel:v0.17.0
 - iptable
+- ingress-controller:v1.1.3
 
 ### 监控报警
 
@@ -31,7 +32,6 @@
 
 - kubernetesui/dashboard:v2.5.1
 - kubernetesui/metrics-scraper:v1.0.7
-- kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.1/aio/deploy/recommended.yaml
 - metrics-server/metrics-server:v0.6.1
 
 --
