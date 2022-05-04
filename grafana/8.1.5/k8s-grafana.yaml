@@ -100,6 +100,7 @@ metadata:
   name: grafana
   namespace: kube-ops
 spec:
+  ingressClassName: nginx
   rules:
     - host: grafana.jason.com
       http:

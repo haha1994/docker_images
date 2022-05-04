@@ -197,6 +197,7 @@ metadata:
   name: prometheus
   namespace: kube-ops
 spec:
+  ingressClassName: nginx
   rules:
     - host: prometheus.jason.com
       http:

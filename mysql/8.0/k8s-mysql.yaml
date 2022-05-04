@@ -80,6 +80,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
 spec:
+  ingressClassName: nginx
   rules:
   - host: mysql.jason.com
     http:
