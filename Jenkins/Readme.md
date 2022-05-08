@@ -16,7 +16,11 @@ cat /root/id_rsa.pub >> .ssh/authorized_keys
 ```
 
 ### 安装插件
-SSH Pipeline Steps
+- SSH Pipeline Steps
+需要明文密码，故不采用
+
+- publish over ssh
+在configure中配置连接，可行
 
 ### 编写Jenkinsfile
 

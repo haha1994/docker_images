@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sre
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: sre
+  labels:
+    app: jenkins
+spec:
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      nodeSelector: 
+        role: master
+      containers:
+      - name: jenkins
+        image: jenkinsci/blueocean:1.25.3
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 50000
+          name: agent
+          protocol: TCP
+        volumeMounts:
+        - name: jenkins-data
+          mountPath: /var/jenkins_home
+        - name: jenkins-docker
+          mountPath: /var/run/docker.sock
+        - name: image-registry
+          mountPath: /root/.docker
+        - name: jenkins-ssh
+          mountPath: /root/.ssh
+        - name: jenkins-k8s
+          mountPath: /root/.kube/config
+      volumes:
+      - name: jenkins-data
+        hostPath:
+          path: /opt/docker_data/jenkins
+      - name: jenkins-docker
+        hostPath:
+          path: /var/run/docker.sock
+      - name: image-registry
+        hostPath:
+          path: /root/.docker
+      - name: jenkins-ssh
+        hostPath:
+          path: /root/.ssh
+      - name: jenkins-k8s
+        hostPath:
+          path: /etc/kubernetes/admin.conf
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+  namespace: sre
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
+  - name: agent
+    protocol: TCP
+    port: 50000
+    targetPort: agent
+  selector:
+    app: jenkins
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jenkins-jason-com
+  namespace: sre
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 10240m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: jenkins.jason.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jenkins
+            port: 
+              number: 80
