@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  mariadb:
+    image: mariadb:10.4
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - /opt/docker_data/mariadb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=admin
+      - MYSQL_DATABASE=common
+      - MYSQL_USER=admin
