@@ -1,0 +1,100 @@
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: sre
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nacos
+  namespace: sre
+  labels:
+    app: nacos
+spec:
+  selector:
+    matchLabels:
+      app: nacos
+  template:
+    metadata:
+      labels:
+        app: nacos
+    spec:
+      nodeSelector: 
+        role: master
+      containers:
+      - name: nacos
+        image: nacos/nacos-server:v2.1.1
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: MODE
+          value: standalone
+        ports:
+        - containerPort: 8848
+          name: server
+        - containerPort: 9848
+          name: client-rpc
+        - containerPort: 9849
+          name: raft-rpc
+        volumeMounts:
+        - name: nacos-data
+          mountPath: /home/project/
+      volumes:
+      - name: nacos-data
+        hostPath:
+          path: /opt/docker_data/nacos/
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nacos
+  namespace: sre
+spec:
+  type: NodePort
+  ports:
+  - name: server
+    protocol: TCP
+    port: 8848
+    targetPort: 8848
+    nodePort: 30848
+  - name: client-rpc
+    protocol: TCP
+    port: 9848
+    targetPort: 9848
+    nodePort: 31848
+  - name: raft-rpc
+    protocol: TCP
+    port: 9849
+    targetPort: 9849
+    nodePort: 31849
+  selector:
+    app: nacos
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jenkins-jason-com
+  namespace: sre
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 10240m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: nacos.jason.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nacos
+            port: 
+              number: 80
