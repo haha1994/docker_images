@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rocketchat
+  namespace: im
+  labels:
+    app: rocketchat
+spec:
+  selector:
+    matchLabels:
+      app: rocketchat
+  template:
+    metadata:
+      labels:
+        app: rocketchat
+    spec:
+      # nodeSelector: 
+      #   role: master
+      containers:
+      - name: rocketchat
+        image: rocket.chat:5.4.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: DEPLOY_METHOD
+          value: docker
+        - name: ROOT_URL
+          value: "http://rocketchat.jason.com"
+        - name: MONGO_URL
+          value: "mongodb://rocketmongo-0.rocketmongo:27017/rocketchat"
+        - name: MONGO_OPLOG_URL
+          value: "mongodb://rocketmongo-0.rocketmongo:27017/local?replSet=rs0"
+        volumeMounts:
+        - name: rocketchat-data
+          mountPath: /var/www/html
+      volumes:
+      - name: rocketchat-data
+        hostPath:
+          path: /opt/docker_data/im/rocketchat/
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rocketchat
+  namespace: sre
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
+  selector:
+    app: rocketchat
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rocketchat-jason-com
+  namespace: im
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 10240m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: rocketchat.jason.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rocketchat
+            port: 
+              number: 80

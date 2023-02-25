@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rocketmongo
+  namespace: im
+  labels:
+    app: rocketmongo
+spec:
+  selector:
+    matchLabels:
+      app: rocketmongo
+  template:
+    metadata:
+      labels:
+        app: rocketmongo
+    spec:
+      # nodeSelector: 
+      #   role: master
+      containers:
+      - name: rocketmongo
+        image: mongo:4.4
+        imagePullPolicy: IfNotPresent
+        command:
+        - mongod
+        - "--bind_ip_all"
+        - "--replSet"
+        - rs0
+        ports:
+        - containerPort: 27017
+          name: http
+        volumeMounts:
+        - name: rocketmongo-data
+          mountPath: /data/db
+      volumes:
+      - name: rocketmongo-data
+        hostPath:
+          path: /opt/docker_data/im/rocketchat/mongo/db
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rocketmongo
+  namespace: im
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: 27017
+    targetPort: http
+  selector:
+    app: rocketmongo
