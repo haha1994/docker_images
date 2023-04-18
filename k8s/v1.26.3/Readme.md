@@ -147,6 +147,10 @@ kubeadm config images list --config kubeadm-config.yaml
 ```
 ctr namespace create k8s.io
 ```
+```
+#拉取镜像
+# kubeadm config images pull --config kubeadm-config.yaml
+```
 ### 初始化节点，如果kubeadm初始化失败了，一定要kubeadm reset
 ```
 kubeadm init --config=kubeadm-config.yaml | tee kubeadm-init.log
@@ -156,35 +160,55 @@ kubeadm init --config=kubeadm-config.yaml | tee kubeadm-init.log
 export KUBECONFIG=/etc/kubernetes/admin.conf
 echo 'export KUBECONFIG=/etc/kubernetes/admin.conf'  >> /etc/frofile
 source /etc/profile
+echo 'source /etc/profile' >> /etc/bashrc
 ```
 ### 将主节点作为工作节点
 ```
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 kubectl label nodes XXX role=master
 ```
-## 安装网络插件flannel 
+## 安装网络插件flannel v0.21.4
 ```
-v0.21.4
+ctr -n k8s.io image pull --plain-http=true docker.io/flannel/flannel:v0.21.4
+ctr -n k8s.io image pull --plain-http=true docker.io/flannel/flannel-cni-plugin:v1.1.2
+# 官网地址 https://github.com/flannel-io/flannel
+# wget https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
 kubectl apply -f kube-flannel.yml
+# 此时kubectl get node 应该是ready状态
 ```
-## 安装ingress-nginx-controller 
+
+## 安装ingress-nginx-controller v1.6.4
 ```
-v1.6.4
-kubectl apply
-kubectl delete -A 
+# 官网 wget https://
+# 修改 ingress-nginx-controller  的 deployment
+# kind: DaemonSet # modify
+# spec:
+# template:
+#   spec:
+#     hostNetwork: true # add
+#     dnsPolicy: ClusterFirstWithHostNet # modify
+kubectl apply -f ingress-nginx-controller-deploy.yaml
+kubectl delete -A validatingwebhookconfiguration ingress-nginx-admission
 ```
-## 安装metrics-server
+## 安装metrics-server v0.6.3
 ```
-v0.6.3
-kubectl apply -f 
+ctr -n k8s.io image pull --plain-http=true registry.k8s.io/metrics-server/metrics-server:v0.6.3
+kubectl apply -f metrics-server-components.yaml
 ```
-## 安装dashboard
+## 安装dashboard v2.7.0
 ```
-v2.7.0
-kubectl apply -f 
-#新版需要手动创建token
-kubectl -n kuberbetes-dashboard create token kubernetes-dashboard-admin
+kubectl apply -f dashborad-recommended.yaml
 ```
+## 创建登录Token（10年有效）
+```
+# 新版需要手动创建token
+kubectl -n kubernetes-dashboard create token kuberbetes-dashboard-admin --duration=99999h
+```
+## 给master节点添加标签
+```
+kubectl label nodes jason.com role=master
+```
+
 ## 需要中转的镜像
 
 ### K8S
