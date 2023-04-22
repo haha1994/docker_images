@@ -193,10 +193,12 @@ kubectl delete -A validatingwebhookconfiguration ingress-nginx-admission
 ## 安装metrics-server v0.6.3
 ```
 ctr -n k8s.io image pull --plain-http=true registry.k8s.io/metrics-server/metrics-server:v0.6.3
+
 kubectl apply -f metrics-server-components.yaml
 ```
 ## 安装dashboard v2.7.0
 ```
+# https://github.com/kubernetes/dashboard/blob/v2.7.0/aio/deploy/recommended.yaml
 kubectl apply -f dashborad-recommended.yaml
 ```
 ## 创建登录Token（10年有效）

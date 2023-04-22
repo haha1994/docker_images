@@ -1,0 +1,37 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: youripaddress #master节点的IP
+  bindPort: 6443
+nodeRegistration:
+  criSocket: unix:///var/run/containerd/containerd.sock
+  imagePullPolicy: IfNotPresent
+  name: youripaddress #修改为IP地址，如果使用域名，必须保证解析正常
+  taints: null
+---
+apiServer:
+  timeoutForControlPlane: 4m0s
+apiVersion: kubeadm.k8s.io/v1beta3
+certificatesDir: /etc/kubernetes/pki
+clusterName: kubernetes
+controllerManager: {}
+dns: {}
+etcd:
+  local:
+    dataDir: /var/lib/etcd #把etcd容器的目录挂载到本地的/var/lib/etcd目录下，防止数据丢失
+imageRepository: registry.k8s.io #镜像仓库地址，可以修改为gcr.azk8s.cn/google_containers
+kind: ClusterConfiguration
+kubernetesVersion: 1.26.3 #Kubernetes软件版本
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: 10.96.0.0/12
+  podSubnet: 10.244.0.0/16 #添加这个内容
+scheduler: {}
